@@ -13,10 +13,10 @@
 #include <EEPROM.h>
 #include <Adafruit_SleepyDog.h>
 /*================================================================================================*/
-#define SHARP_LED_PIN 6
+#define SHARP_LED_PIN 10
 #define SHARP_VO_PIN A0 
 #define CCS_811_INTERRUPT_PIN 7 // 0,1 are UART, 2,3 are i2c so 7 is the only remaining pin 
-#define CCS_811_nWAKE 4
+#define CCS_811_nWAKE 11
 #define DHTPIN 5
 #define DHTTYPE DHT22
 #define EEPROM_CLEAR_BUTTON_PIN 20 //TODO maybe change the pin
@@ -42,6 +42,7 @@ GP2YDustSensor dustSensor(GP2YDustSensorType::GP2Y1010AU0F, SHARP_LED_PIN, SHARP
 void setup() {
     pinMode(LED_BUILTIN, OUTPUT);
     pinMode(CCS_811_nWAKE, OUTPUT);
+    //pinMode(CCS_811_INTERRUPT_PIN, INPUT); //TODO test this
     /*-   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   */
     setupEEPROM();
     /*-   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -
@@ -65,6 +66,10 @@ void setup() {
     }
     co2Sensor.setDriveMode(CCS811_DRIVE_MODE_60SEC);
     co2Sensor.enableInterrupt();
+    /*TODO test this
+    co2Sensor.readData(); //discard first reading, to let the sensor pull the INT pin high.
+    b_isrFlag = false; //just to be shure also reset the interrupt flag
+    digitalWrite(CCS_811_INTERRUPT_PIN, HIGH); //hopfully do not have to use this!*/
     /*-   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   */
     delayMicroseconds(25); //Logic engine should run at least 20 us
     digitalWrite(CCS_811_nWAKE, HIGH); //Disable Logic Engine
