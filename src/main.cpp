@@ -66,6 +66,7 @@ void setup() {
     co2Sensor.setDriveMode(CCS811_DRIVE_MODE_60SEC);
     co2Sensor.enableInterrupt();
     /*-   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   */
+    delayMicroseconds(25); //Logic engine should run at least 20 us
     digitalWrite(CCS_811_nWAKE, HIGH); //Disable Logic Engine
     /*-   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -
     //After ~80 seconds of non responsivness, Watchdog will reset the MCU.*/
