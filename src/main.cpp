@@ -308,9 +308,7 @@ void transmitSerial(uint16_t eco2Value, uint16_t tvocValue, uint16_t dustDensity
     json["fields"]["temperature"].set(temperatureValue);
     json["fields"]["humidity"].set(humidityValue);
     json["fields"]["dust density"].set(dustDensityValue);
-    
-    if(g_loopCount == 0) //The value only changes if an interrupt is triggered
-        json["fields"]["dust baseline"].set(dustSensorBaseline);
+    json["fields"]["dust baseline"].set(dustSensorBaseline);
     
     while(!Serial); //Because we have USB Serial, we do not have to begin Serial
     serializeJson(json,Serial);
@@ -339,9 +337,7 @@ void transmitSerial(uint16_t eco2Value, uint16_t tvocValue, uint16_t dustDensity
     json["fields"]["eCO2"].set(eco2Value);
     json["fields"]["TVOC"].set(tvocValue);
     json["fields"]["dust density"].set(dustDensityValue);
-    
-    if(g_loopCount == 0) //The value only changes if an interrupt is triggered
-        json["fields"]["dust baseline"].set(dustSensorBaseline);
+    json["fields"]["dust baseline"].set(dustSensorBaseline);
     
     while(!Serial); //Because we have USB Serial, we do not have to begin Serial
     serializeJson(json,Serial);
