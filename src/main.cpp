@@ -16,8 +16,6 @@
 #include <FlashAsEEPROM.h>  
 /*================================================================================================*/
 #define RANDOM_SEED_ADC_PIN A1 // NOTE NEVER CONNECT A SENSOR TO THIS PIN
-#define SHARP_LED_PIN 6
-#define SHARP_VO_PIN A0 
 #define CCS_811_INTERRUPT_PIN 7 // 0,1 are UART, 2,3 are i2c so 7 is the only remaining pin 
 #define CCS_811_nWAKE 4
 #define DHTPIN 5
