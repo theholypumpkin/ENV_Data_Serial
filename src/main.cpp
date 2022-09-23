@@ -15,6 +15,9 @@
  */
 #include <FlashAsEEPROM.h>  
 /*================================================================================================*/
+#define RANDOM_SEED_ADC_PIN A1 // NOTE NEVER CONNECT A SENSOR TO THIS PIN
+#define SHARP_LED_PIN 6
+#define SHARP_VO_PIN A0 
 #define CCS_811_INTERRUPT_PIN 7 // 0,1 are UART, 2,3 are i2c so 7 is the only remaining pin 
 #define CCS_811_nWAKE 4
 #define DHTPIN 5
@@ -155,10 +158,9 @@ void setReadFlagISRCallback(){
  */
 void setupEEPROM(){
     
-    Button eepromClearButton(EEPROM_CLEAR_BUTTON_PIN, 50);
+    Button eepromClearButton(EEPROM_CLEAR_BUTTON_PIN);
     eepromClearButton.begin();
     unsigned long loopEnd = millis() + 5000;
-    
     while(millis() < loopEnd){ //check for 5 seconds if the button is pressed
         eepromClearButton.read();
         if(eepromClearButton.isPressed()){
@@ -187,6 +189,8 @@ void setupEEPROM(){
      * but never use the "never written" value of FFFF.
      */
     if((g_uuid == 0x0) || (g_uuid == 0xFFFF)){
+        //When we have to generate a new UUID generate new seed for Random function
+        randomSeed(analogRead(RANDOM_SEED_ADC_PIN));
         g_uuid = (uint16_t)random(0x100,0xFFFE); //generates random uuid in range of 0x100 to 0xFFFE
         uuidUpperByte = g_uuid >> 8;
         uuidLowerByte = (g_uuid << 8) >> 8; //remove the upper 8 bit
