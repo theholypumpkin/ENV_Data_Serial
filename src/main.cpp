@@ -167,7 +167,9 @@ void setReadFlagISRCallback(){
  */
 void setupEEPROM(){
     
-    Button eepromClearButton(EEPROM_srandom
+    Button eepromClearButton(EEPROM_CLEAR_BUTTON_PIN);
+    eepromClearButton.begin();
+    unsigned long loopEnd = millis() + 5000;
     while(millis() < loopEnd){ //check for 5 seconds if the button is pressed
         eepromClearButton.read();
         if(eepromClearButton.isPressed()){
