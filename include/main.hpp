@@ -10,9 +10,11 @@ void setupEEPROM();
 void readCCSSensor(uint16_t &eco2Value, uint16_t &tvocValue);
 void readCCSSensor(uint16_t &eco2Value, uint16_t &tvocValue, 
     float temperatureValue, float humidityValue);
+    
 bool readDHTSensor(float &temperatureValue, float &humidityValue);
 void publishMQTT(uint16_t eco2Value, uint16_t tvocValue,
     float temperatureValue, float humidityValue, float voltage, float percentage);
+
 void publishMQTT(uint16_t eco2Value, uint16_t tvocValue, float voltage, float percentage);
 float calcBatteryPercentage(float voltage);
 #endif

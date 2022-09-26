@@ -18,7 +18,7 @@
  */
 #include <FlashAsEEPROM.h>  
 /*================================================================================================*/
-#define RANDOM_SEED_ADC_PIN A1 // NOTE NEVER CONNECT A SENSOR TO THIS PIN
+#define RANDOM_SEED_ADC_PIN A1 // NOTE: NEVER CONNECT A SENSOR TO THIS PIN
 #define BATTERY_VOLTAGE_ADC_PIN A7
 #define CCS_811_INTERRUPT_PIN 7 // 0,1 are UART, 2,3 are i2c so 7 is the only remaining pin 
 #define CCS_811_nWAKE 4
@@ -136,10 +136,12 @@ void loop() {
                 if(b_ENVDataCorrection){
                     publishMQTT(eco2Value, tvocValue, temperatureValue, humidityValue, 
                         batteryVoltage, batteryPercentage);
-                }else{
-                    publishMQTT(eco2Value,tvocValue, batteryVoltage, batteryPercentage);
                 }
-            }else{
+                else{
+                    publishMQTT(eco2Value, tvocValue, batteryVoltage, batteryPercentage);
+                }
+            }
+            else{
                 const char *errorLUT[] = {
                     "MQTT_DISCONNECTED",
                     "MQTT_CONNECT_FAILED",
@@ -292,7 +294,7 @@ bool readDHTSensor(float &temperatureValue, float &humidityValue){
  * @param dustDensityValue The read Dust Density Value
  * @param dustSensorBaseline The dust Sensor baseline when available
  */
-void publishMQTT(uint16_t eco2Value, uint16_t tvocValue, uint16_t, float voltage, float percentage){
+void publishMQTT(uint16_t eco2Value, uint16_t tvocValue, float voltage, float percentage){
     
     StaticJsonDocument<100> json; //create a json object //NOTE size of document check
     json["tags"]["location"].set(g_location);
@@ -343,8 +345,8 @@ void publishMQTT(uint16_t eco2Value, uint16_t tvocValue,
  * 
  * @param adcValue the integer Reading of the ADC across the voltage divider. The factor to convert
  * the value is calculated only once on setup.
- * @return float the battery percantage baseed on the formula (x/143)^2+3.71 for change above
- * 16% and -(x/30-0.86)^6+3.724 for charge below 16% or 3.723 Volts
+ * @return float the battery percantage based on the formula y = 143*sqrt(x-3.71) for change above
+ * 16% and abs(30*pow(abs(x-3.724),1/6)-25.8) for charge below 16% or 3.723 Volts
  */
 float calcBatteryPercentage(float voltage){
     if(voltage < 3.723){

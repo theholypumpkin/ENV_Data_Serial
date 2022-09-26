@@ -3,7 +3,14 @@
 #endif
 #ifndef _SECRETS_HPP
 #define _SECRETS_HPP
-extern const char* g_name = "a name for your sensor";
-extern const char* g_location = "a location where your sensor is located";
-extern const char* g_influxDbMeasurement = "the influxdb measurment name";
+extern const char* g_name = "a name you like";
+extern const char* g_location = "kitchen or whatever";
+extern const IPAddress g_mqttServerUrl(0,0,0,0);
+extern const uint16_t g_mqttServerPort = 8883;
+extern const char* g_mqttUsername = "your usename";
+extern const char* g_mqttPassword = "your password";
+extern const char* g_wifiSsid = "wifi name";
+extern const char* g_wifiPass = "wifi password";
+
+extern const char* g_indoorAirQualityTopic = "data/topic/";
 #endif
