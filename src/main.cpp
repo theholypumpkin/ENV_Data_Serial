@@ -20,7 +20,7 @@
 #define CCS_811_nWAKE 11
 #define DHTPIN 5
 #define DHTTYPE DHT22
-#define EEPROM_CLEAR_BUTTON_PIN 20 //TODO maybe change the pin
+#define EEPROM_CLEAR_BUTTON_PIN 9
 /*================================================================================================*/
 enum statemachine_t
 {
