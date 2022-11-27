@@ -69,9 +69,6 @@ void setup() {
     /*-   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   */
     delayMicroseconds(25); //Logic engine should run at least 20 us
     digitalWrite(CCS_811_nWAKE, HIGH); //Disable Logic Engine
-    /*-   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -
-    //After ~80 seconds of non responsivness, Watchdog will reset the MCU.*/
-    Watchdog.enable(80000);
 }
 /*________________________________________________________________________________________________*/
 /**
@@ -142,7 +139,6 @@ void loop() {
             }
         }
         e_state = IDLE; //set the loop to idle until new interrupt triggers a change.
-        Watchdog.reset();
         break;
     /*-   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   */
     case IDLE:
@@ -166,47 +162,58 @@ void setReadFlagISRCallback(){
  * a button is pressed, it will clear the flash and generate a new UUID
  */
 void setupEEPROM(){
-    
+    //BUG UUID is alway reset it should stay the same!
     Button eepromClearButton(EEPROM_CLEAR_BUTTON_PIN);
     eepromClearButton.begin();
     unsigned long loopEnd = millis() + 5000;
-    while(millis() < loopEnd){ //check for 5 seconds if the button is pressed
+    while (millis() < loopEnd)
+    { // check for 5 seconds if the button is pressed
+        #ifdef ARDUINO_SAMD_NANO_33_IOT
+        if(!EEPROM.isValid()) //If never written to the EEPROM Emulation, ignore the button.
+        #endif
+            break;
         eepromClearButton.read();
-        if(eepromClearButton.isPressed()){
+        if (eepromClearButton.isPressed())
+        {
             // This loop will take about 3.3*256 ms to complete which is about 0.85 seconds.
-            for (uint16_t i = 0 ; i < EEPROM.length() ; i++) {
+            for (uint16_t i = 0; i < EEPROM.length(); i++)
+            {
                 EEPROM.write(i, 0);
             }
-            break; //when we reset the eeprom terminate the while loop
+            break; // when we reset the eeprom terminate the while loop
         }
     }
     /*-   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   */
     /* For compability reasons and portability to other microcontroller we will not use the more
-     * convinient EEPROM.get(addr, g_uuid); and EEPROM.put(addr, g_uuid); methods. 
-     * Instead we read individual bytes in the little endian order as it is standard on the AVR 
+     * convinient EEPROM.get(addr, g_uuid); and EEPROM.put(addr, g_uuid); methods.
+     * Instead we read individual bytes in the little endian order as it is standard on the AVR
      * and common on the ARM Architecture.
      */
     uint16_t addr = 0;
-    uint16_t uuidUpperByte = (uint16_t) EEPROM.read(addr + 1) << 8;
-    uint16_t uuidLowerByte = (uint16_t) EEPROM.read(addr);
-    g_uuid = uuidUpperByte + uuidLowerByte; //leftshift by 8 bit
+    uint16_t uuidUpperByte = (uint16_t)EEPROM.read(addr + 1) << 8;
+    uint16_t uuidLowerByte = (uint16_t)EEPROM.read(addr);
+    g_uuid = uuidUpperByte + uuidLowerByte; // leftshift by 8 bit
     /* Under the curcumstance that we had reset the eeprom once all bytes are 0.
      * When we never wrote anything to the EEPROM of the microcontroller all bytes will be FF.
      * Because we have a two byte variable, we have to check of the value not 0 or FFFF
-     * 
+     *
      * We only generate a random variable between 0x100 and 0xFFFE, to we always use both bytes,
      * but never use the "never written" value of FFFF.
      */
-    if((g_uuid == 0x0) || (g_uuid == 0xFFFF)){
-        //When we have to generate a new UUID generate new seed for Random function
+    if ((g_uuid == 0x0) || (g_uuid == 0xFFFF))
+    {
+        // When we have to generate a new UUID generate new seed for Random function
         randomSeed(analogRead(RANDOM_SEED_ADC_PIN));
-        g_uuid = (uint16_t)random(0x100,0xFFFE); //generates random uuid in range of 0x100 to 0xFFFE
+        g_uuid = (uint16_t)random(0x100, 0xFFFE); // generates random uuid in range of 0x100 to 0xFFFE
         uuidUpperByte = g_uuid >> 8;
-        uuidLowerByte = (g_uuid << 8) >> 8; //remove the upper 8 bit
-        //EEPROM.put(addr, g_uuid);
-        //Write the generated UUID to EEPROM
-        EEPROM.write(addr, (uint8_t) uuidLowerByte);
-        EEPROM.write(addr + 1, (uint8_t) uuidUpperByte);
+        uuidLowerByte = (g_uuid << 8) >> 8; // remove the upper 8 bit
+        // EEPROM.put(addr, g_uuid);
+        // Write the generated UUID to EEPROM
+        EEPROM.write(addr, (uint8_t)uuidLowerByte);
+        EEPROM.write(addr + 1, (uint8_t)uuidUpperByte);
+        #ifdef ARDUINO_SAMD_NANO_33_IOT
+        EEPROM.commit(); //Accually writing the data to the EEPROM Emulation!
+        #endif
     }
 }
 /*________________________________________________________________________________________________*/
