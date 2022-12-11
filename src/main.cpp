@@ -31,7 +31,7 @@ volatile bool b_isrFlag = false; //a flag which is flipped inside an isr
 /*________________________________________________________________________________________________*/
 DHT tempHmdSensor(DHTPIN, DHTTYPE); //Create the DHT object
 Adafruit_CCS811 co2Sensor;
-LiquidCrystal_I2C lcd(PCF8574_ADDR_A21_A11_A01, 4, 5, 6, 16, 11, 12, 13, 14, POSITIVE);
+LiquidCrystal_I2C lcd(0x27, 16, 2);
 /*================================================================================================*/
 void setup() {
     pinMode(LED_BUILTIN, OUTPUT);
@@ -62,6 +62,7 @@ void setup() {
     /*-   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -
     Begin the LCD*/
     lcd.begin();
+    lcd.backlight(HIGH);
     lcd.print("I'm working");
     delay(2000);
 
