@@ -9,6 +9,6 @@ void setReadFlagISRCallback();
 void readCCSSensor(uint16_t &eco2Value, uint16_t &tvocValue);
 void readCCSSensor(uint16_t &eco2Value, uint16_t &tvocValue, 
     float temperatureValue, float humidityValue);
-bool readDHTSensor(float &temperatureValue, float &humidityValue);
+bool readDHTSensor(float &temperatureValue, float &humidityValue, float &heatIndexValue);
 
 #endif
