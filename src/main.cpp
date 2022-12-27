@@ -71,22 +71,13 @@ void setup()
     }
     co2Sensor.setDriveMode(CCS811_DRIVE_MODE_60SEC);
     co2Sensor.enableInterrupt();
-    /*TODO test this
-    co2Sensor.readData(); //discard first reading, to let the sensor pull the INT pin high.
-    b_isrFlag = false; //just to be shure also reset the interrupt flag
-    digitalWrite(CCS_811_INTERRUPT_PIN, HIGH); //hopfully do not have to use this!*/
     /*-   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   */
     delayMicroseconds(25);             // Logic engine should run at least 20 us
     digitalWrite(CCS_811_nWAKE, HIGH); // Disable Logic Engine
     /*-   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -
-     * After ~80 seconds of non responsivness, Watchdog will reset the MCU.
-     * Watchdog will never work, because it can not work longer than 8 seconds, and I will not
-     *  reset the Watchdog in IDLE because we olny want it to be reset if I can not successfully 
-     * read data.
-     */
-    //int cnt = Watchdog.enable(10000);
-    //Serial.print("Watchdog Reset time: ");
-    //Serial.println(cnt);
+    setup the Serial connection so home-assitant can understand the data after it got parsed and 
+    transmitted via mqtt on the host system python script.*/
+
 }
 /*________________________________________________________________________________________________*/
 /**
@@ -454,5 +445,36 @@ void transmitSerial(uint16_t eco2Value, uint16_t tvocValue, uint16_t dustDensity
     Serial.println();
     Serial.flush(); // clear output buffer
 }
+/*________________________________________________________________________________________________*/
+/**
+ * @brief Sends the Read Sensor values via the Serial interface to the Server to be saved in the
+ * database.
+ *
+ * @param eco2Value The read CO2 Value
+ * @param tvocValue The read TVOC Value
+ * @param dustDensityValue The read Dust Density Value
+ * @param temperatureValue The read Temperature Value
+ * @param humidityValue The Read Humidity Value
+ * @param dustSensorBaseline The dust Sensor baseline when available
+ */
+void setupSerialHAMqtt(char * entityName, char * entityUniqueID, char * dev)
+{
+    StaticJsonDocument<100> json; // create a json object //NOTE size of document check
+    json["measurement"].set(g_influxDbMeasurement);
+    json["tags"]["location"].set(g_location);
+    json["tags"]["uuid"].set(g_uuid);
+    json["tags"]["name"].set(g_name);
+    json["fields"]["eCO2"].set(eco2Value);
+    json["fields"]["TVOC"].set(tvocValue);
+    json["fields"]["temperature"].set(temperatureValue);
+    json["fields"]["humidity"].set(humidityValue);
+    json["fields"]["dust density"].set(dustDensityValue);
+    json["fields"]["dust baseline"].set(dustSensorBaseline);
 
+    while (!Serial)
+        ; // Because we have USB Serial, we do not have to begin Serial
+    serializeJson(json, Serial);
+    Serial.println();
+    Serial.flush(); // clear output buffer
+}
 /*end of file*/
