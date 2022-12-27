@@ -77,6 +77,12 @@ void setup()
     /*-   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -
     setup the Serial connection so home-assitant can understand the data after it got parsed and 
     transmitted via mqtt on the host system python script.*/
+    configHADeviceSerial("CO2", "est. co2", "carbon_dioxide", "mdi:molecule-co2", "ppm");
+    configHADeviceSerial("Air Quality", "tvoc", "volatile_organic_compounds", "mdi:air-filter", "ppb");
+    configHADeviceSerial("Temperature", "temperature", "temperature", "mdi:temperature-celsius", "°C");
+    configHADeviceSerial("Humidity", "humidity", "humidity", "mdi:water-percent", "%");
+    configHADeviceSerial("Dust Density", "dust density", "None", "mdi:smoke", "mg/m^3");
+    configHADeviceSerial("Dust Baseline", "dust baseline", "None", "mdi:numeric-0", ".");
 
 }
 /*________________________________________________________________________________________________*/
@@ -341,16 +347,12 @@ void transmitSerial(uint16_t eco2Value, uint16_t tvocValue, uint16_t dustDensity
 {
 
     StaticJsonDocument<100> json; // create a json object //NOTE size of document check
-    json["measurement"].set(g_influxDbMeasurement);
-    json["tags"]["location"].set(g_location);
-    json["tags"]["uuid"].set(g_uuid);
-    json["tags"]["name"].set(g_name);
-    json["fields"]["eCO2"].set(eco2Value);
-    json["fields"]["TVOC"].set(tvocValue);
-    json["fields"]["temperature"].set(temperatureValue);
-    json["fields"]["humidity"].set(humidityValue);
-    json["fields"]["dust density"].set(dustDensityValue);
-    json["fields"]["dust baseline"].set(dustSensorBaseline);
+    json["eCO2"].set(eco2Value);
+    json["TVOC"].set(tvocValue);
+    json["temperature"].set(temperatureValue);
+    json["humidity"].set(humidityValue);
+    json["dust density"].set(dustDensityValue);
+    json["dust baseline"].set(dustSensorBaseline);
 
     while (!Serial)
         ; // Because we have USB Serial, we do not have to begin Serial
@@ -373,14 +375,10 @@ void transmitSerial(uint16_t eco2Value, uint16_t tvocValue, uint16_t dustDensity
 {
 
     StaticJsonDocument<100> json; // create a json object //NOTE size of document check
-    json["measurement"].set(g_influxDbMeasurement);
-    json["tags"]["location"].set(g_location);
-    json["tags"]["uuid"].set(g_uuid);
-    json["tags"]["name"].set(g_name);
-    json["fields"]["eCO2"].set(eco2Value);
-    json["fields"]["TVOC"].set(tvocValue);
-    json["fields"]["dust density"].set(dustDensityValue);
-    json["fields"]["dust baseline"].set(dustSensorBaseline);
+    json["eCO2"].set(eco2Value);
+    json["TVOC"].set(tvocValue);
+    json["dust density"].set(dustDensityValue);
+    json["dust baseline"].set(dustSensorBaseline);
 
     while (!Serial)
         ; // Because we have USB Serial, we do not have to begin Serial
@@ -404,15 +402,11 @@ void transmitSerial(uint16_t eco2Value, uint16_t tvocValue, uint16_t dustDensity
 {
 
     StaticJsonDocument<100> json; // create a json object //NOTE size of document check
-    json["measurement"].set(g_influxDbMeasurement);
-    json["tags"]["location"].set(g_location);
-    json["tags"]["uuid"].set(g_uuid);
-    json["tags"]["name"].set(g_name);
-    json["fields"]["eCO2"].set(eco2Value);
-    json["fields"]["TVOC"].set(tvocValue);
-    json["fields"]["temperature"].set(temperatureValue);
-    json["fields"]["humidity"].set(humidityValue);
-    json["fields"]["dust density"].set(dustDensityValue);
+    json["eCO2"].set(eco2Value);
+    json["TVOC"].set(tvocValue);
+    json["temperature"].set(temperatureValue);
+    json["humidity"].set(humidityValue);
+    json["dust density"].set(dustDensityValue);
     while (!Serial)
         ; // Because we have USB Serial, we do not have to begin Serial
     serializeJson(json, Serial);
@@ -432,13 +426,9 @@ void transmitSerial(uint16_t eco2Value, uint16_t tvocValue, uint16_t dustDensity
 {
 
     StaticJsonDocument<100> json; // create a json object //NOTE size of document check
-    json["measurement"].set(g_influxDbMeasurement);
-    json["tags"]["location"].set(g_location);
-    json["tags"]["uuid"].set(g_uuid);
-    json["tags"]["name"].set(g_name);
-    json["fields"]["eCO2"].set(eco2Value);
-    json["fields"]["TVOC"].set(tvocValue);
-    json["fields"]["dust density"].set(dustDensityValue);
+    json["eCO2"].set(eco2Value);
+    json["TVOC"].set(tvocValue);
+    json["dust density"].set(dustDensityValue);
     while (!Serial)
         ; // Because we have USB Serial, we do not have to begin Serial
     serializeJson(json, Serial);
@@ -457,19 +447,18 @@ void transmitSerial(uint16_t eco2Value, uint16_t tvocValue, uint16_t dustDensity
  * @param humidityValue The Read Humidity Value
  * @param dustSensorBaseline The dust Sensor baseline when available
  */
-void setupSerialHAMqtt(char * entityName, char * entityUniqueID, char * dev)
+void configHADeviceSerial(char * entityName, char * entityUniqueID, char * deviceClass, char * logo, 
+                       char * unitOfMeasurment)
 {
     StaticJsonDocument<100> json; // create a json object //NOTE size of document check
-    json["measurement"].set(g_influxDbMeasurement);
-    json["tags"]["location"].set(g_location);
-    json["tags"]["uuid"].set(g_uuid);
-    json["tags"]["name"].set(g_name);
-    json["fields"]["eCO2"].set(eco2Value);
-    json["fields"]["TVOC"].set(tvocValue);
-    json["fields"]["temperature"].set(temperatureValue);
-    json["fields"]["humidity"].set(humidityValue);
-    json["fields"]["dust density"].set(dustDensityValue);
-    json["fields"]["dust baseline"].set(dustSensorBaseline);
+    json["name"].set(entityName);
+    json["uniq_id"].set(entityUniqueID);
+    json["dev_cla"].set(deviceClass);
+    json["ic"].set(logo);
+    json["unit_of_meas"].set(unitOfMeasurment);
+    json["dev"]["ids"].set(g_uuid);
+    json["dev"]["name"].set(g_name);
+    json[stat_t].set(""); //keep emty for now
 
     while (!Serial)
         ; // Because we have USB Serial, we do not have to begin Serial
