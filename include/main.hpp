@@ -20,4 +20,7 @@ void transmitSerial(uint16_t eco2Value, uint16_t tvocValue, uint16_t dustDensity
 void transmitSerial(uint16_t eco2Value, uint16_t tvocValue, uint16_t dustDensityValue,
     float temperatureValue, float humidityValue);
 void transmitSerial(uint16_t eco2Value, uint16_t tvocValue, uint16_t dustDensityValue);
+
+void configHADeviceSerial(char * entityName, char * entityUniqueID, char * deviceClass, char * logo, 
+                          char * unitOfMeasurment);
 #endif
