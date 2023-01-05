@@ -21,6 +21,7 @@
 #define DHTPIN 5
 #define DHTTYPE DHT22
 #define EEPROM_CLEAR_BUTTON_PIN 9
+#define JSON_DOCUMENT_SIZE 511
 /*================================================================================================*/
 enum statemachine_t
 {
@@ -346,7 +347,7 @@ void transmitSerial(uint16_t eco2Value, uint16_t tvocValue, uint16_t dustDensity
                     float temperatureValue, float humidityValue, float dustSensorBaseline)
 {
 
-    StaticJsonDocument<100> json; // create a json object //NOTE size of document check
+    StaticJsonDocument<JSON_DOCUMENT_SIZE> json; // create a json object //NOTE size of document check
     json["eCO2"].set(eco2Value);
     json["TVOC"].set(tvocValue);
     json["temperature"].set(temperatureValue);
@@ -374,7 +375,7 @@ void transmitSerial(uint16_t eco2Value, uint16_t tvocValue, uint16_t dustDensity
                     float dustSensorBaseline)
 {
 
-    StaticJsonDocument<100> json; // create a json object //NOTE size of document check
+    StaticJsonDocument<JSON_DOCUMENT_SIZE> json; // create a json object //NOTE size of document check
     json["eCO2"].set(eco2Value);
     json["TVOC"].set(tvocValue);
     json["dust density"].set(dustDensityValue);
@@ -401,7 +402,7 @@ void transmitSerial(uint16_t eco2Value, uint16_t tvocValue, uint16_t dustDensity
                     float temperatureValue, float humidityValue)
 {
 
-    StaticJsonDocument<100> json; // create a json object //NOTE size of document check
+    StaticJsonDocument<JSON_DOCUMENT_SIZE> json; // create a json object //NOTE size of document check
     json["eCO2"].set(eco2Value);
     json["TVOC"].set(tvocValue);
     json["temperature"].set(temperatureValue);
@@ -425,7 +426,7 @@ void transmitSerial(uint16_t eco2Value, uint16_t tvocValue, uint16_t dustDensity
 void transmitSerial(uint16_t eco2Value, uint16_t tvocValue, uint16_t dustDensityValue)
 {
 
-    StaticJsonDocument<100> json; // create a json object //NOTE size of document check
+    StaticJsonDocument<JSON_DOCUMENT_SIZE> json; // create a json object //NOTE size of document check
     json["eCO2"].set(eco2Value);
     json["TVOC"].set(tvocValue);
     json["dust density"].set(dustDensityValue);
@@ -450,7 +451,7 @@ void transmitSerial(uint16_t eco2Value, uint16_t tvocValue, uint16_t dustDensity
 void configHADeviceSerial(char * entityName, char * entityUniqueID, char * deviceClass, char * logo, 
                        char * unitOfMeasurment)
 {
-    StaticJsonDocument<200> json; // create a json object //NOTE size of document check
+    StaticJsonDocument<JSON_DOCUMENT_SIZE> json; // create a json object //NOTE size of document check
     json["name"].set(entityName);
     json["uniq_id"].set(entityUniqueID);
     json["dev_cla"].set(deviceClass);
