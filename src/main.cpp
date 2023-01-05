@@ -451,6 +451,11 @@ void transmitSerial(uint16_t eco2Value, uint16_t tvocValue, uint16_t dustDensity
 void configHADeviceSerial(char * entityName, char * entityUniqueID, char * deviceClass, char * logo, 
                        char * unitOfMeasurment)
 {
+    String stat_t = "serHA/";
+    stat_t += g_uuid; //maybe this has to be g_uuid my screenshots are not quiet clear on that
+    stat_t += "/";
+    stat_t += entityUniqueID;
+    stat_t += "/stat_t";
     StaticJsonDocument<JSON_DOCUMENT_SIZE> json; // create a json object //NOTE size of document check
     json["name"].set(entityName);
     json["uniq_id"].set(entityUniqueID);
@@ -459,7 +464,7 @@ void configHADeviceSerial(char * entityName, char * entityUniqueID, char * devic
     json["unit_of_meas"].set(unitOfMeasurment);
     json["dev"]["ids"].set(g_uuid);
     json["dev"]["name"].set(g_name);
-    json["stat_t"].set(""); //keep empty for now
+    json["stat_t"].set(stat_t); //because it is a string it will sadly be duplicated in memory
 
     while (!Serial)
         ; // Because we have USB Serial, we do not have to begin Serial
