@@ -10,15 +10,15 @@ void setupEEPROM();
 void readCCSSensor(uint16_t &eco2Value, uint16_t &tvocValue);
 void readCCSSensor(uint16_t &eco2Value, uint16_t &tvocValue, 
     float temperatureValue, float humidityValue);
-bool readDHTSensor(float &temperatureValue, float &humidityValue);
+bool readDHTSensor(float &temperatureValue, float &heatIndexValue, float &humidityValue);
 uint16_t readGP2YSensor(uint16_t numberOfSamples = (uint16_t)20U);
 float readGPY2SensorBaselineCanidate();
 void transmitSerial(uint16_t eco2Value, uint16_t tvocValue, uint16_t dustDensityValue,
-    float temperatureValue, float humidityValue, float dustSensorBaseline);
+    float temperatureValue, float heatIndexValue, float humidityValue, float dustSensorBaseline);
 void transmitSerial(uint16_t eco2Value, uint16_t tvocValue, uint16_t dustDensityValue,
     float dustSensorBaseline);
 void transmitSerial(uint16_t eco2Value, uint16_t tvocValue, uint16_t dustDensityValue,
-    float temperatureValue, float humidityValue);
+    float temperatureValue, float heatIndexValue, float humidityValue);
 void transmitSerial(uint16_t eco2Value, uint16_t tvocValue, uint16_t dustDensityValue);
 
 void configHADeviceSerial(char * entityName, char * entityUniqueID, char * deviceClass, char * logo, 

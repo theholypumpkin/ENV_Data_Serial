@@ -11,7 +11,6 @@
 #include <ArduinoJson.h>
 #include <JC_Button.h>
 #include <EEPROM.h>
-#include <Adafruit_SleepyDog.h>
 /*================================================================================================*/
 #define RANDOM_SEED_ADC_PIN A1 // NOTE NEVER CONNECT A SENSOR TO THIS PIN
 #define SHARP_LED_PIN 10
@@ -81,6 +80,7 @@ void setup()
     configHADeviceSerial("CO2", "est. co2", "carbon_dioxide", "mdi:molecule-co2", "ppm");
     configHADeviceSerial("Air Quality", "tvoc", "volatile_organic_compounds", "mdi:air-filter", "ppb");
     configHADeviceSerial("Temperature", "temperature", "temperature", "mdi:temperature-celsius", "°C");
+    configHADeviceSerial("Heat Index", "heatindex", "temperature", "mdi:temperature-celsius", "°C");
     configHADeviceSerial("Humidity", "humidity", "humidity", "mdi:water-percent", "%");
     configHADeviceSerial("Dust Density", "dust density", "None", "mdi:smoke", "mg/m^3");
     configHADeviceSerial("Dust Baseline", "dust baseline", "None", "mdi:numeric-0", ".");
@@ -97,7 +97,7 @@ void loop()
 {
     // make static to retain variables even if out of scope.
     static uint16_t eco2Value, tvocValue, dustDensityValue;
-    static float temperatureValue, humidityValue, dustSensorBaseline;
+    static float temperatureValue, heatIndexValue, humidityValue, dustSensorBaseline;
     static bool b_ENVDataCorrection;
     /*-   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   */
     if (b_isrFlag)
@@ -118,10 +118,7 @@ void loop()
     switch (e_state)
     {
     case READ_DHT_SENSOR:
-        b_ENVDataCorrection = readDHTSensor(temperatureValue, humidityValue);
-        /* Unnecessary because we don't break but improves readability
-         * optimizer will likly remove it anyway
-         */
+        b_ENVDataCorrection = readDHTSensor(temperatureValue, heatIndexValue, humidityValue);
         e_state = READ_CCS_SENSOR;
         break;
     /*-   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   */
@@ -152,12 +149,12 @@ void loop()
             if (g_loopCount == 0)
             {
                 transmitSerial(eco2Value, tvocValue, dustDensityValue,
-                               temperatureValue, humidityValue, dustSensorBaseline);
+                               temperatureValue, heatIndexValue, humidityValue, dustSensorBaseline);
             }
             else
             {
                 transmitSerial(eco2Value, tvocValue, dustDensityValue,
-                               temperatureValue, humidityValue);
+                               temperatureValue, heatIndexValue, humidityValue);
             }
         }
         else
@@ -314,14 +311,15 @@ float readGPY2SensorBaselineCanidate()
 }
 /*________________________________________________________________________________________________*/
 /**
- * @brief Gets the Current Temperature and Humidity
+ * @brief Gets the current temperature and humidity
  *
- * @param temperatureValue A Reference where the temperature Value should be saved at
- * @param humidityValue A Reference where the humidity Value should be saved at
- * @return true if the Reading was sucessful
+ * @param temperatureValue A reference where the temperature value should be saved at
+ * @param heatIndexValue A reference where the heat index vlaue should be saved at
+ * @param humidityValue A reference where the humidity value should be saved at
+ * @return true if the reading was sucessful
  * @return false if the reading was unsucessful and the read value is 'Not A Number'
  */
-bool readDHTSensor(float &temperatureValue, float &humidityValue)
+bool readDHTSensor(float &temperatureValue, float &heatIndexValue, float &humidityValue)
 {
     temperatureValue = tempHmdSensor.readTemperature();
     humidityValue = tempHmdSensor.readHumidity();
@@ -329,6 +327,7 @@ bool readDHTSensor(float &temperatureValue, float &humidityValue)
     {
         return false;
     }
+    heatIndexValue = tempHmdSensor.computeHeatIndex(false);
     return true;
 }
 /*________________________________________________________________________________________________*/
@@ -340,17 +339,20 @@ bool readDHTSensor(float &temperatureValue, float &humidityValue)
  * @param tvocValue The read TVOC Value
  * @param dustDensityValue The read Dust Density Value
  * @param temperatureValue The read Temperature Value
+ * @param heatIndexValue The calculated Heat Index Value
  * @param humidityValue The Read Humidity Value
  * @param dustSensorBaseline The dust Sensor baseline when available
  */
 void transmitSerial(uint16_t eco2Value, uint16_t tvocValue, uint16_t dustDensityValue,
-                    float temperatureValue, float humidityValue, float dustSensorBaseline)
+                    float temperatureValue, float heatIndexValue, float humidityValue, 
+                    float dustSensorBaseline)
 {
 
     StaticJsonDocument<JSON_DOCUMENT_SIZE> json; // create a json object //NOTE size of document check
     json["eCO2"].set(eco2Value);
     json["TVOC"].set(tvocValue);
     json["temperature"].set(temperatureValue);
+    json["heat index"].set(heatIndexValue);
     json["humidity"].set(humidityValue);
     json["dust density"].set(dustDensityValue);
     json["dust baseline"].set(dustSensorBaseline);
@@ -396,16 +398,18 @@ void transmitSerial(uint16_t eco2Value, uint16_t tvocValue, uint16_t dustDensity
  * @param tvocValue The read TVOC Value
  * @param dustDensityValue The read Dust Density Value
  * @param temperatureValue The read Temperature Value
+ * @param heatIndexValue The calculated Heat Index Value
  * @param humidityValue The Read Humidity Value
  */
 void transmitSerial(uint16_t eco2Value, uint16_t tvocValue, uint16_t dustDensityValue,
-                    float temperatureValue, float humidityValue)
+                    float temperatureValue, float heatIndexValue, float humidityValue)
 {
 
     StaticJsonDocument<JSON_DOCUMENT_SIZE> json; // create a json object //NOTE size of document check
     json["eCO2"].set(eco2Value);
     json["TVOC"].set(tvocValue);
     json["temperature"].set(temperatureValue);
+    json["heat index"].set(heatIndexValue);
     json["humidity"].set(humidityValue);
     json["dust density"].set(dustDensityValue);
     while (!Serial)
