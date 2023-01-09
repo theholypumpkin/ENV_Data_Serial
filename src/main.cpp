@@ -35,6 +35,9 @@ volatile statemachine_t e_state = IDLE;
 /*================================================================================================*/
 uint16_t g_uuid, g_loopCount = 0;
 volatile bool b_isrFlag = false; // a flag which is flipped inside an isr
+const char entityIDCo2 = "co2", entityIDTvoc = "tvoc", entityIDTemperature = "tmpC", 
+           entityIDHeatIndex = "hiC", entityIDHumidity = "hmd", entityIDDustDensity = "dd", 
+           entityIDDustBaseline = "db";
 /*________________________________________________________________________________________________*/
 DHT tempHmdSensor(DHTPIN, DHTTYPE); // Create the DHT object
 Adafruit_CCS811 co2Sensor;
@@ -77,13 +80,16 @@ void setup()
     /*-   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -
     setup the Serial connection so home-assitant can understand the data after it got parsed and 
     transmitted via mqtt on the host system python script.*/
-    configHADeviceSerial("CO2", "est. co2", "carbon_dioxide", "mdi:molecule-co2", "ppm");
-    configHADeviceSerial("Air Quality", "tvoc", "volatile_organic_compounds", "mdi:air-filter", "ppb");
-    configHADeviceSerial("Temperature", "temperature", "temperature", "mdi:temperature-celsius", "°C");
-    configHADeviceSerial("Heat Index", "heatindex", "temperature", "mdi:temperature-celsius", "°C");
-    configHADeviceSerial("Humidity", "humidity", "humidity", "mdi:water-percent", "%");
-    configHADeviceSerial("Dust Density", "dust density", "None", "mdi:smoke", "mg/m^3");
-    configHADeviceSerial("Dust Baseline", "dust baseline", "None", "mdi:numeric-0", ".");
+    configHADeviceSerial("CO2", entityIDCo2, "carbon_dioxide", "mdi:molecule-co2", "ppm");
+    configHADeviceSerial("Air Quality", entityIDTvoc, "volatile_organic_compounds", 
+                         "mdi:air-filter", "ppb");
+    configHADeviceSerial("Temperature", entityIDTemperature, "temperature", 
+                         "mdi:temperature-celsius", "°C");
+    configHADeviceSerial("Heat Index", entityIDHeatIndex, "temperature", 
+                         "mdi:temperature-celsius", "°C");
+    configHADeviceSerial("Humidity", entityIDHumidity, "humidity", "mdi:water-percent", "%");
+    configHADeviceSerial("Dust Density", entityIDDustDensity, "None", "mdi:smoke", "mg/m^3");
+    configHADeviceSerial("Dust Baseline", entityIDDustBaseline, "None", "mdi:numeric-0", ".");
 
 }
 /*________________________________________________________________________________________________*/
@@ -349,13 +355,13 @@ void transmitSerial(uint16_t eco2Value, uint16_t tvocValue, uint16_t dustDensity
 {
 
     StaticJsonDocument<JSON_DOCUMENT_SIZE> json; // create a json object //NOTE size of document check
-    json["eCO2"].set(eco2Value);
-    json["TVOC"].set(tvocValue);
-    json["temperature"].set(temperatureValue);
-    json["heat index"].set(heatIndexValue);
-    json["humidity"].set(humidityValue);
-    json["dust density"].set(dustDensityValue);
-    json["dust baseline"].set(dustSensorBaseline);
+    json[entityIDCo2].set(eco2Value);
+    json[entityIDTvoc].set(tvocValue);
+    json[entityIDTemperature].set(temperatureValue);
+    json[entityIDHeatIndex].set(heatIndexValue);
+    json[entityIDHumidity].set(humidityValue);
+    json[entityIDDustDensity].set(dustDensityValue);
+    json[entityIDDustBaseline].set(dustSensorBaseline);
 
     while (!Serial)
         ; // Because we have USB Serial, we do not have to begin Serial
@@ -378,10 +384,10 @@ void transmitSerial(uint16_t eco2Value, uint16_t tvocValue, uint16_t dustDensity
 {
 
     StaticJsonDocument<JSON_DOCUMENT_SIZE> json; // create a json object //NOTE size of document check
-    json["eCO2"].set(eco2Value);
-    json["TVOC"].set(tvocValue);
-    json["dust density"].set(dustDensityValue);
-    json["dust baseline"].set(dustSensorBaseline);
+    json[entityIDCo2].set(eco2Value);
+    json[entityIDTvoc].set(tvocValue);
+    json[entityIDDustDensity].set(dustDensityValue);
+    json[entityIDDustBaseline].set(dustSensorBaseline);
 
     while (!Serial)
         ; // Because we have USB Serial, we do not have to begin Serial
@@ -406,12 +412,12 @@ void transmitSerial(uint16_t eco2Value, uint16_t tvocValue, uint16_t dustDensity
 {
 
     StaticJsonDocument<JSON_DOCUMENT_SIZE> json; // create a json object //NOTE size of document check
-    json["eCO2"].set(eco2Value);
-    json["TVOC"].set(tvocValue);
-    json["temperature"].set(temperatureValue);
-    json["heat index"].set(heatIndexValue);
-    json["humidity"].set(humidityValue);
-    json["dust density"].set(dustDensityValue);
+    json[entityIDCo2].set(eco2Value);
+    json[entityIDTvoc].set(tvocValue);
+    json[entityIDTemperature].set(temperatureValue);
+    json[entityIDHeatIndex].set(heatIndexValue);
+    json[entityIDHumidity].set(humidityValue);
+    json[entityIDDustDensity].set(dustDensityValue);
     while (!Serial)
         ; // Because we have USB Serial, we do not have to begin Serial
     serializeJson(json, Serial);
@@ -431,9 +437,9 @@ void transmitSerial(uint16_t eco2Value, uint16_t tvocValue, uint16_t dustDensity
 {
 
     StaticJsonDocument<JSON_DOCUMENT_SIZE> json; // create a json object //NOTE size of document check
-    json["eCO2"].set(eco2Value);
-    json["TVOC"].set(tvocValue);
-    json["dust density"].set(dustDensityValue);
+    json[entityIDCo2].set(eco2Value);
+    json[entityIDTvoc].set(tvocValue);
+    json[entityIDDustDensity].set(dustDensityValue);
     while (!Serial)
         ; // Because we have USB Serial, we do not have to begin Serial
     serializeJson(json, Serial);
