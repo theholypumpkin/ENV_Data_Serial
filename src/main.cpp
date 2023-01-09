@@ -81,15 +81,22 @@ void setup()
     setup the Serial connection so home-assitant can understand the data after it got parsed and 
     transmitted via mqtt on the host system python script.*/
     configHADeviceSerial("CO2", entityIDCo2, "carbon_dioxide", "mdi:molecule-co2", "ppm");
+    delay(100);
     configHADeviceSerial("Air Quality", entityIDTvoc, "volatile_organic_compounds", 
                          "mdi:air-filter", "ppb");
+    delay(100);
     configHADeviceSerial("Temperature", entityIDTemperature, "temperature", 
                          "mdi:temperature-celsius", "°C");
+    delay(100);
     configHADeviceSerial("Heat Index", entityIDHeatIndex, "temperature", 
                          "mdi:temperature-celsius", "°C");
+    delay(100);
     configHADeviceSerial("Humidity", entityIDHumidity, "humidity", "mdi:water-percent", "%");
+    delay(100);
     configHADeviceSerial("Dust Density", entityIDDustDensity, "None", "mdi:smoke", "mg/m^3");
+    delay(100);
     configHADeviceSerial("Dust Baseline", entityIDDustBaseline, "None", "mdi:numeric-0", ".");
+    delay(100);
 
 }
 /*________________________________________________________________________________________________*/
