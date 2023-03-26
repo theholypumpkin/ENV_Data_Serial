@@ -134,15 +134,15 @@ void loop() {
         }else{
             e_state = IDLE;
         }
-        if(tvocValue > 250){
+        if(tvocValue > 500){
             digitalWrite(YELLOW_LED_PIN, HIGH);
             digitalWrite(RED_LED_PIN, LOW);
         }
-        else if (tvocValue > 100){
+        else if (tvocValue > 200){
             digitalWrite(YELLOW_LED_PIN, LOW);
             digitalWrite(RED_LED_PIN, LOW);
         }
-        else if (tvocValue > 50){
+        else if (tvocValue > 100){
             digitalWrite(YELLOW_LED_PIN, LOW);
             digitalWrite(RED_LED_PIN, HIGH);
         }
