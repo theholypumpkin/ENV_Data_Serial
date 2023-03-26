@@ -114,12 +114,11 @@ void setup()
     Serial1.print("IP Address: ");
     Serial1.println(WiFi.localIP());
     /*-   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   */
-    byte uuid_arr[2] = {
-        (byte)g_uuid >> 8, //remove the lower byte and retains the uppper byte
-        (byte)(g_uuid << 8) >> 8 //removes the upper byte by shifting it out of range and than back.
-        }; 
-    
-    device.setUniqueId(uuid_arr, 2);
+    uint16_tByte uuid_arr; //a union to convert uint16_t to a byte
+    uuid_arr.i = g_uuid;
+    byte arr[2] = {uuid_arr.b[1], uuid_arr.b[0]}; //flip endianness
+
+    device.setUniqueId(arr, 2);
     device.setName(g_name);
     mqttClient.begin(g_mqttServerUrl, g_mqttServerPort, g_mqttUsername, g_mqttPassword);
     /*-   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   */

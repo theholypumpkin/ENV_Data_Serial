@@ -15,6 +15,7 @@ extern const char* g_mqttUsername = "your usename";
 extern const char* g_mqttPassword = "your password";
 extern const char* g_wifiSsid = "wifi name";
 extern const char* g_wifiPass = "wifi password";
+extern const char* g_ntpTimeServerURL = "http://some-url.net";
 
 extern const char* g_indoorAirQualityTopic = "data/topic/";
 #endif

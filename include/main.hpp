@@ -3,6 +3,13 @@
 #endif
 #ifndef _MAIN_HPP
 #define _MAIN_HPP
+
+// A union so we can easily cast a uint16_t into a array of bytes.
+union uint16_tByte{
+    byte b[sizeof(uint16_t)];
+    uint16_t i;
+};
+
 void setup();
 void loop();
 void alarmISRCallback();
