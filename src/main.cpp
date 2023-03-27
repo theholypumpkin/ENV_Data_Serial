@@ -72,15 +72,15 @@ HAMqtt mqttClient(wifiClient, device);
  * After looking into the library it might be impossible because Ha writes the Strings onto the
  * flash
  */
-HASensorNumber tempHASensor("temp", HASensorNumber::PrecisionP2);
-HASensorNumber hmdHASensor("hmd", HASensorNumber::PrecisionP2);
-HASensorNumber heatIndexHASensor("hI", HASensorNumber::PrecisionP2);
-HASensorNumber co2HASensor("co2");
-HASensorNumber tvocHASensor("aqi");
-HASensorNumber batVoltageHASensor("batV", HASensorNumber::PrecisionP2);
-HASensorNumber batPercentHASensor("batP", HASensorNumber::PrecisionP2);
-HASensorNumber rssiHASensor("rssi");
-HASensor locationHASensor("loc");
+HASensorNumber tempHASensor(HA_TEMP_ENTITY_ID, HASensorNumber::PrecisionP2);
+HASensorNumber hmdHASensor(HA_HMD_ENTITY_ID, HASensorNumber::PrecisionP2);
+HASensorNumber heatIndexHASensor(HA_HI_ENTITY_ID, HASensorNumber::PrecisionP2);
+HASensorNumber co2HASensor(HA_CO2_ENTITY_ID);
+HASensorNumber tvocHASensor(HA_AQI_ENTITY_ID);
+HASensorNumber batVoltageHASensor(HA_BATV_ENTITY_ID, HASensorNumber::PrecisionP2);
+HASensorNumber batPercentHASensor(HA_BATP_ENTITY_ID, HASensorNumber::PrecisionP2);
+HASensorNumber rssiHASensor(HA_RSSI_ENTITY_ID);
+HASensor locationHASensor(HA_LOC_ENTITY_ID);
 /*================================================================================================*/
 void setup()
 {
@@ -504,15 +504,5 @@ float calcBatteryPercentageLiPo(float x)
         return 255.0f*x - 930.0f;      
     else
         return 0.0;
-}
-/*________________________________________________________________________________________________*/
-char *uniqueHAEntityGenerator(const char* entityName){
-    size_t entityLength = strlen(entityName)+1; //include the null terminator
-    size_t nameLength = strlen(g_name)+1;
-    char *entity = new char[entityLength + nameLength + 2];
-    
-    strcpy(entity, g_name); //entity now contains the string of g_name
-    strcat(entity, entityName);
-    return entity;
 }
 /*end of file*/

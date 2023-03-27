@@ -28,6 +28,4 @@ void publishMQTT(uint16_t eco2Value, uint16_t tvocValue, long rssiValue,
 float calcBatteryPercentageLiPo(float voltage);
 
 bool updateNetworkTime();
-
-char *uniqueHAEntityGenerator(const char* entityName);
 #endif
