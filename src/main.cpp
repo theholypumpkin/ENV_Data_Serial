@@ -103,7 +103,7 @@ void setup()
             bool state = digitalRead(LED_BUILTIN);
             digitalWrite(LED_BUILTIN, !state);
             delay(500); // When falure blink LED rapidly
-            Serial1.println("CCS Error");
+            Serial1.println(F("CCS Error"));
         }
     }
     co2Sensor.setDriveMode(CCS811_DRIVE_MODE_60SEC);
@@ -112,17 +112,17 @@ void setup()
     digitalWrite(CCS_811_nWAKE, HIGH); // Disable Logic Engine
     /*-   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   */
     //Begin the Wifi Connection
-    Serial1.print("Connecting...");
+    Serial1.print(F("Connecting..."));
     WiFi.setHostname(g_name);
     //esablishing wifi connection
     while(WiFi.begin(g_wifiSsid, g_wifiPass) != WL_CONNECTED){ //retry connect indef
         delay(100);
-        Serial1.print(".");
+        Serial1.print(F("."));
         //TODO Wire gpio to reset pin and triger it after some time
     }
     WiFi.lowPowerMode();
-    Serial1.println("connected");
-    Serial1.print("IP Address: ");
+    Serial1.println(F("connected"));
+    Serial1.print(F("IP Address: "));
     Serial1.println(WiFi.localIP());
     /*-   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   */
     uint16_tByte uuid_arr; //a union to convert uint16_t to a byte
@@ -175,9 +175,9 @@ void setup()
     rtc.begin(); //begin the rtc at "random time" probably  Jan 1 2000 at 00:00:00 o'clock
     g_lastRtcUpdateDay = rtc.getDay();
     if(updateNetworkTime()){ //set real time acording to network
-        Serial1.println("Network Time successful");
+        Serial1.println(F("Network Time successful"));
     }else{
-        Serial1.println("ERROR: No Network Time");
+        Serial1.println(F("ERROR: No Network Time"));
     }
     rtc.setAlarmSeconds(rtc.getSeconds()-1);
     rtc.enableAlarm(rtc.MATCH_SS); //Set Alarm every minute
@@ -208,15 +208,15 @@ void loop()
     }
     if(g_lastRtcUpdateDay != rtc.getDay()){ //update network time daily
         if(updateNetworkTime()){ //set real time acording to network
-            Serial1.println("Updated Network Time");
+            Serial1.println(F("Updated Network Time"));
         }else{
-            Serial1.println("Network Time Update failed");
+            Serial1.println(F("Network Time Update failed"));
         }
     }
     /*-   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   */
     switch(e_state){
     case IDLE:
-        Serial1.println("Sleeping now");
+        Serial1.println(F("Sleeping now"));
         rtc.standbyMode();
         break;
     /*-   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   */
@@ -300,7 +300,7 @@ bool updateNetworkTime(){
  */
 void setupEEPROM()
 {
-    Serial1.print("Awaiting Button Press");
+    Serial1.print(F("Awaiting Button Press"));
     //BUG UUID is alway reset it should stay the same!
     Button eepromClearButton(EEPROM_CLEAR_BUTTON_PIN);
     eepromClearButton.begin();
@@ -311,11 +311,11 @@ void setupEEPROM()
         if(!EEPROM.isValid()) //If never written to the EEPROM Emulation, ignore the button.
         #endif
             break;
-        Serial1.print(".");
+        Serial1.print(F("."));
         eepromClearButton.read();
         if (eepromClearButton.isPressed())
         {
-            Serial.println("Button was pressed");
+            Serial.println(F("Button was pressed"));
             // This loop will take about 3.3*256 ms to complete which is about 0.85 seconds.
             for (uint16_t i = 0; i < EEPROM.length(); i++)
             {
@@ -334,7 +334,7 @@ void setupEEPROM()
     uint16_t uuidUpperByte = (uint16_t)EEPROM.read(addr + 1) << 8;
     uint16_t uuidLowerByte = (uint16_t)EEPROM.read(addr);
     g_uuid = uuidUpperByte + uuidLowerByte; // leftshift by 8 bit
-    Serial1.print("Current UUID: ");
+    Serial1.print(F("Current UUID: "));
     Serial1.println(g_uuid, HEX);
     /* Under the curcumstance that we had reset the eeprom once all bytes are 0.
      * When we never wrote anything to the EEPROM of the microcontroller all bytes will be FF.
@@ -358,7 +358,7 @@ void setupEEPROM()
         EEPROM.commit(); //Accually writing the data to the EEPROM Emulation!
         #endif
     }
-    Serial1.print("New UUID: ");
+    Serial1.print(F("New UUID: "));
     Serial1.println(g_uuid, HEX);
 }
 /*________________________________________________________________________________________________*/
@@ -444,11 +444,11 @@ float voltage, float percentage)
     batVoltageHASensor.setValue(voltage);
     batPercentHASensor.setValue(percentage);
 
-    Serial1.print("eco2: "); Serial1.print(eco2Value);
-    Serial1.print("tvoc: "); Serial1.print(tvocValue);
-    Serial1.print("rssi: "); Serial1.print(rssiValue);
-    Serial1.print("voltage: "); Serial1.print(voltage);
-    Serial1.print("percentage: "); Serial1.println(percentage);
+    Serial1.print(F("eco2: ")); Serial1.print(eco2Value);
+    Serial1.print(F("tvoc: ")); Serial1.print(tvocValue);
+    Serial1.print(F("rssi: ")); Serial1.print(rssiValue);
+    Serial1.print(F("voltage: ")); Serial1.print(voltage);
+    Serial1.print(F("percentage: ")); Serial1.println(percentage);
 } 
 /*________________________________________________________________________________________________*/
 /**
@@ -477,14 +477,14 @@ void publishMQTT(uint16_t eco2Value, uint16_t tvocValue, long rssiValue,
     batVoltageHASensor.setValue(voltage);
     batPercentHASensor.setValue(percentage);
 
-    Serial1.print("temperature: "); Serial1.print(temperatureValue);
-    Serial1.print("humidity: "); Serial1.print(humidityValue);
-    Serial1.print("heatIndex: "); Serial1.print(heatIndexValue);
-    Serial1.print("eco2: "); Serial1.print(eco2Value);
-    Serial1.print("tvoc: "); Serial1.print(tvocValue);
-    Serial1.print("rssi: "); Serial1.print(rssiValue);
-    Serial1.print("voltage: "); Serial1.print(voltage);
-    Serial1.print("percentage: "); Serial1.println(percentage);
+    Serial1.print(F("temperature: ")); Serial1.print(temperatureValue);
+    Serial1.print(F("humidity: ")); Serial1.print(humidityValue);
+    Serial1.print(F("heatIndex: ")); Serial1.print(heatIndexValue);
+    Serial1.print(F("eco2: ")); Serial1.print(eco2Value);
+    Serial1.print(F("tvoc: ")); Serial1.print(tvocValue);
+    Serial1.print(F("rssi: ")); Serial1.print(rssiValue);
+    Serial1.print(F("voltage: ")); Serial1.print(voltage);
+    Serial1.print(F("percentage: ")); Serial1.println(percentage);
 }
 /*________________________________________________________________________________________________*/
 /**
