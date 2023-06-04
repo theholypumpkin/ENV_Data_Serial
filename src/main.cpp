@@ -218,6 +218,7 @@ void loop()
     case IDLE:
         Serial1.println(F("Sleeping now"));
         rtc.standbyMode();
+        //delay(60000); //delay a minute
         break;
     /*-   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   */
     case READ_DHT_SENSOR:
@@ -432,23 +433,30 @@ bool readDHTSensor(float &temperatureValue, float &humidityValue, float &heatInd
  * @param eco2Value The read CO2 Value
  * @param tvocValue The read TVOC Value
  * @param rssi The WiFi Signal Strength
- * @param voltage the battery voltage
- * @param percentage the calculated battery percentage
+ * @param voltageValue the battery voltage
+ * @param percentageValue the calculated battery percentage
  */
 void publishMQTT(uint16_t eco2Value, uint16_t tvocValue, long rssiValue, 
-float voltage, float percentage)
+float voltageValue, float percentageValue)
 {
-    co2HASensor.setValue(eco2Value);
-    tvocHASensor.setValue(tvocValue);
-    rssiHASensor.setValue(rssiValue);
-    batVoltageHASensor.setValue(voltage);
-    batPercentHASensor.setValue(percentage);
+    bool success = true;
+    success = co2HASensor.setValue(eco2Value);
+    success = tvocHASensor.setValue(tvocValue);
+    success = rssiHASensor.setValue(rssiValue);
+    success = batVoltageHASensor.setValue(voltageValue);
+    success = batPercentHASensor.setValue(percentageValue);
 
-    Serial1.print(F("eco2: ")); Serial1.print(eco2Value);
+    char buff[128];
+    sprintf(buff, 
+        "mqtt successful: %s, eco2: %u, tvoc: %u, rssi: %li, voltage: %.2f, percentage: %.2f", 
+        success ? "true" : "false", eco2Value, tvocValue, rssiValue, voltageValue, percentageValue
+    );
+    Serial1.println(buff);
+    /*Serial1.print(F("eco2: ")); Serial1.print(eco2Value);
     Serial1.print(F("tvoc: ")); Serial1.print(tvocValue);
     Serial1.print(F("rssi: ")); Serial1.print(rssiValue);
-    Serial1.print(F("voltage: ")); Serial1.print(voltage);
-    Serial1.print(F("percentage: ")); Serial1.println(percentage);
+    Serial1.print(F("voltage: ")); Serial1.print(voltageValue);
+    Serial1.print(F("percentage: ")); Serial1.println(percentageValue);*/
 } 
 /*________________________________________________________________________________________________*/
 /**
@@ -457,51 +465,58 @@ float voltage, float percentage)
  *
  * @param eco2Value The read CO2 Value
  * @param tvocValue The read TVOC Value
- * @param rssi The WiFi Signal Strength
+ * @param rssiValue The WiFi Signal Strength
  * @param temperatureValue The read Temperature Value
  * @param humidityValue The read Humidity Value
  * @param heatIndexValue The calculated heat index value
- * @param voltage the battery voltage
- * @param percentage the calculated battery percentage
+ * @param voltageValue the battery voltage
+ * @param percentageValue the calculated battery percentage
  */
 void publishMQTT(uint16_t eco2Value, uint16_t tvocValue, long rssiValue,
                  float temperatureValue, float humidityValue, float heatIndexValue, 
-                 float voltage, float percentage)
+                 float voltageValue, float percentageValue)
 {
-    tempHASensor.setValue(temperatureValue);
-    hmdHASensor.setValue(humidityValue);
-    heatIndexHASensor.setValue(heatIndexValue);
-    co2HASensor.setValue(eco2Value);
-    tvocHASensor.setValue(tvocValue);
-    rssiHASensor.setValue(rssiValue);
-    batVoltageHASensor.setValue(voltage);
-    batPercentHASensor.setValue(percentage);
-
-    Serial1.print(F("temperature: ")); Serial1.print(temperatureValue);
-    Serial1.print(F("humidity: ")); Serial1.print(humidityValue);
-    Serial1.print(F("heatIndex: ")); Serial1.print(heatIndexValue);
-    Serial1.print(F("eco2: ")); Serial1.print(eco2Value);
+    bool success = true;
+    success = tempHASensor.setValue(temperatureValue);
+    success = hmdHASensor.setValue(humidityValue);
+    success = heatIndexHASensor.setValue(heatIndexValue);
+    success = co2HASensor.setValue(eco2Value);
+    success = tvocHASensor.setValue(tvocValue);
+    success = rssiHASensor.setValue(rssiValue);
+    success = batVoltageHASensor.setValue(voltageValue);
+    success = batPercentHASensor.setValue(percentageValue);
+    
+    char buff[192];
+    sprintf(buff, 
+        "mqtt connected: %s, temperature: %.2f, humidity: %.2f, heatIndex: %.2f, eco2:%u, tvoc: %u, rssi: %li, voltage: %.2f, percentage: %.2f", 
+        mqttClient.isConnected() ? "true" : "false", temperatureValue, humidityValue, heatIndexValue, eco2Value, 
+        tvocValue, rssiValue, voltageValue, percentageValue
+    );
+    Serial1.println(buff);
+    /*Serial1.print(F("temperature: ")); Serial1.print(temperatureValue);
+    Serial1.print(F(", humidity: ")); Serial1.print(humidityValue);
+    Serial1.print(F(", heatIndex: ")); Serial1.print(heatIndexValue);
+    Serial1.print(F(", eco2: ")); Serial1.print(eco2Value);
     Serial1.print(F("tvoc: ")); Serial1.print(tvocValue);
     Serial1.print(F("rssi: ")); Serial1.print(rssiValue);
-    Serial1.print(F("voltage: ")); Serial1.print(voltage);
-    Serial1.print(F("percentage: ")); Serial1.println(percentage);
+    Serial1.print(F("voltage: ")); Serial1.print(voltageValue);
+    Serial1.print(F("percentage: ")); Serial1.println(percentageValue);*/
 }
 /*________________________________________________________________________________________________*/
 /**
  * @brief Calculate the battery percentage acording to two differnet formulas depending on the
  * voltage read by the ADC.
  *
- * @param adcValue the integer Reading of the ADC across the voltage divider. The factor to convert
- * the value is calculated only once on setup.
+ * @param voltageValue the read battery voltage
  * @return float the battery percantage based on the formula y = 120x-404 for change above
  * 63% and 255x-930 for charge below 63%.
  */
-float calcBatteryPercentageLiPo(float x)
+float calcBatteryPercentageLiPo(float voltageValue)
 {
-    if(x > 3.896)
-        return 120.0f*x-404;
-    else if (x > 3.648)
-        return 255.0f*x - 930.0f;      
+    if(voltageValue > 3.896)
+        return 120.0f*voltageValue-404;
+    else if (voltageValue > 3.648)
+        return 255.0f*voltageValue - 930.0f;      
     else
         return 0.0;
 }
