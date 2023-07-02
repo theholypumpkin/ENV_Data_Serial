@@ -62,16 +62,7 @@ WiFiClient wifiClient;
 /*-   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   */
 HADevice device;
 HAMqtt mqttClient(wifiClient, device);
-/* TODO each entity muss be unique on a global level in Home Assitant, hence we have to dinamically
- * append the sensor uuid and or the sensor name to make it unique.
- * Apperently we can not simply use strcat this locks up the mcu.
- * We could allocate memory on the heap but because we are still global we couldn't free the memory
- * which is not safe or useful. We can not return a static char* on the stack if we want
- * to make the size of the dynamic.
- * 
- * After looking into the library it might be impossible because Ha writes the Strings onto the
- * flash
- */
+
 HASensorNumber tempHASensor(HA_TEMP_ENTITY_ID, HASensorNumber::PrecisionP2);
 HASensorNumber hmdHASensor(HA_HMD_ENTITY_ID, HASensorNumber::PrecisionP2);
 HASensorNumber heatIndexHASensor(HA_HI_ENTITY_ID, HASensorNumber::PrecisionP2);
@@ -131,7 +122,7 @@ void setup()
 
     device.setUniqueId(arr, 2);
     device.setName(g_name);
-    mqttClient.begin(g_mqttServerUrl, g_mqttServerPort, g_mqttUsername, g_mqttPassword);
+    mqttClient.begin(g_mqttServerUrl, g_mqttServerPort, g_mqttUsername, g_mqttPassword, 90);
     /*-   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   */
     //Setting the parameters of the Sensors in a way Home Assitant understands them
     tempHASensor.setName("Temperature");
