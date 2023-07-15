@@ -123,58 +123,77 @@ void setup()
     device.setUniqueId(arr, 2);
     device.setName(g_name);
     mqttClient.begin(g_mqttServerUrl, g_mqttServerPort, g_mqttUsername, g_mqttPassword, 90);
+    mqttClient.loop(); //connect for the first time
     /*-   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   */
     //Setting the parameters of the Sensors in a way Home Assitant understands them
     tempHASensor.setName("Temperature");
-    hmdHASensor.setName("Humidity");
-    heatIndexHASensor.setName("Heat Index");
-    co2HASensor.setName("CO2");
-    tvocHASensor.setName("Air Quality");
-    batVoltageHASensor.setName("Battery Voltage");
-    batPercentHASensor.setName("Battery Percentage");
-    rssiHASensor.setName("WiFi Signal Strength");
-
     tempHASensor.setUnitOfMeasurement("°C");
-    hmdHASensor.setUnitOfMeasurement("%");
-    heatIndexHASensor.setUnitOfMeasurement("°C");
-    co2HASensor.setUnitOfMeasurement("ppm");
-    tvocHASensor.setUnitOfMeasurement("ppb");
-    batVoltageHASensor.setUnitOfMeasurement("V");
-    batPercentHASensor.setUnitOfMeasurement("%");
-    rssiHASensor.setUnitOfMeasurement("dBm");
-
     tempHASensor.setIcon("mdi:temperature-celsius");
-    hmdHASensor.setIcon("mdi:water-percent");
-    heatIndexHASensor.setIcon("mdi:temperature-celsius");
-    co2HASensor.setIcon("mdi:molecule-co2");
-    tvocHASensor.setIcon("mdi:air-filter");
-    batVoltageHASensor.setIcon("mdi:battery");
-    batPercentHASensor.setIcon("mdi:battery");
-    rssiHASensor.setIcon("mdi:wifi-strength-3-alert");
-
     tempHASensor.setDeviceClass("temperature");
+
+    hmdHASensor.setName("Humidity");
+    hmdHASensor.setUnitOfMeasurement("%");
+    hmdHASensor.setIcon("mdi:water-percent");
     hmdHASensor.setDeviceClass("humidity");
+
+    heatIndexHASensor.setName("Heat Index");
+    heatIndexHASensor.setUnitOfMeasurement("°C");
+    heatIndexHASensor.setIcon("mdi:temperature-celsius");
     heatIndexHASensor.setDeviceClass("temperature");
+
+    delayMicroseconds(100);
+    
+    co2HASensor.setName("CO2");
+    co2HASensor.setUnitOfMeasurement("ppm");
+    co2HASensor.setIcon("mdi:molecule-co2");
     co2HASensor.setDeviceClass("carbon_dioxide");
+
+    delayMicroseconds(100);
+
+    tvocHASensor.setName("Air Quality");
+    tvocHASensor.setUnitOfMeasurement("ppb");
+    tvocHASensor.setIcon("mdi:air-filter");
     tvocHASensor.setDeviceClass("volatile_organic_compounds");
+
+    delayMicroseconds(100);
+
+    batVoltageHASensor.setName("Battery Voltage");
+    batVoltageHASensor.setUnitOfMeasurement("V");
+    batVoltageHASensor.setIcon("mdi:battery");
     batVoltageHASensor.setDeviceClass("voltage");
+
+    delayMicroseconds(100);
+
+    batPercentHASensor.setName("Battery Percentage");
+    batPercentHASensor.setUnitOfMeasurement("%");
+    batPercentHASensor.setIcon("mdi:battery");
     batPercentHASensor.setDeviceClass("battery");
+
+    delayMicroseconds(100);
+
+    rssiHASensor.setName("WiFi Signal Strength");
+    rssiHASensor.setUnitOfMeasurement("dBm");
+    rssiHASensor.setIcon("mdi:wifi-strength-3-alert");
     rssiHASensor.setDeviceClass("signal_strength");
     
+    delayMicroseconds(100);
+
+    locationHASensor.setName("Roomname");
+    locationHASensor.setIcon("mdi:house");
+    delayMicroseconds(100);
     locationHASensor.setValue(g_location);
     /*-   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   */
     rtc.begin(); //begin the rtc at "random time" probably  Jan 1 2000 at 00:00:00 o'clock
     g_lastRtcUpdateDay = rtc.getDay();
-    if(updateNetworkTime()){ //set real time acording to network
+    if(updateNetworkTime()) //set real time acording to network
         Serial1.println(F("Network Time successful"));
-    }else{
+    else
         Serial1.println(F("ERROR: No Network Time"));
-    }
     rtc.setAlarmSeconds(rtc.getSeconds()-1);
     rtc.enableAlarm(rtc.MATCH_SS); //Set Alarm every minute
     rtc.attachInterrupt(alarmISRCallback); //When alarm trigger this callback.
     /*-   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   */
-    //TODO Attach LBO Interrupt
+    //Attach LBO Interrupt
     /*-   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   */
     delay(10000); // give us some time to upload a new program
 }
