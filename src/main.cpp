@@ -10,9 +10,7 @@
 #include <DHT.h>
 #include <DHT_U.h>
 #include <Adafruit_CCS811.h>
-//#include <ArduinoJson.h>
 #include <JC_Button.h>
-//#include <PubSubClient.h>
 #include <ArduinoHA.h>
 #include <cmath>
 #include <cstring>
